@@ -1,4 +1,4 @@
-from AOCInputReader import *
+from aoc.helper import AOCInputReader
 
 alphas = ("one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
 digits = (1, 2, 3, 4, 5, 6, 7, 8, 9)
@@ -103,7 +103,7 @@ def part1(lines):
 
 
 if __name__ == '__main__':
-    calibration_document = readLinesFromFile("input.txt")
+    calibration_document = AOCInputReader.readLinesFromFile("input.txt")
     #part1(calibration_document)
     part2(calibration_document)
 

@@ -1,15 +1,15 @@
 import re
 
-import AOCInputReader
+from aoc.helper import AOCInputReader
 
-document_lines = AOCInputReader.readLinesFromFile()
+from typing import List, Tuple
 
+document_lines: list[str] = AOCInputReader.readLinesFromFile()
 
 
 # sum of all of the part numbers in the engine schematic
-def sum_part_numbers_in_engine():
-
-    parts = []
+def part_details():
+    parts_details = []
     for line_index, line in enumerate(document_lines):
         matches = re.finditer("\\d+", line)
         for match in matches:
@@ -19,8 +19,8 @@ def sum_part_numbers_in_engine():
             is_part = is_engine_part(number, number_index, line_index, document_lines)
             print(f"{number}={is_part}")
             if is_part:
-                parts.append(int(number))
-    return parts
+                parts_details.append((int(number), line_index, match.start(), match.end()))
+    return parts_details
 
 
 def is_symbol(s):
@@ -60,12 +60,35 @@ def is_engine_part(number: str, number_index, line_index_of_n, document_lines):
                 return True
     return False
 
-def gears():
+
+def is_neighbour(a_start, a_length, b_start_index, b_length, offset=1):
+    set1 = set(range(a_start - offset, a_start + a_length + offset))
+    set2 = set(range(b_start_index, b_start_index + b_length))
+    return len(set1.intersection(set2))
 
 
-    return
+# expects a list of 3-tuple (number, line_index, start_index)
+def gears(part_details: List[Tuple[int, int, int, int]]):
+    sum = 0
+    for i, line in enumerate(document_lines):
+        for asterisk in re.finditer("\*", line):
+            neighbours = 0
+            values = []
+            # only thos above,in, and below line
+            number_start = [(number, index, start_index, end_index) for (number, index, start_index, end_index) in
+                            part_details if
+                            index in (i, i - 1, i + 1)]
+            for number, index, start_index, end_index in number_start:
+                if is_neighbour(asterisk.start(), 1, start_index, len(str(number))):
+                    values.append(number)
+            if len(values) == 2:
+                sum = sum + (values[0] * values[1])
+    return sum
+
 
 if __name__ == '__main__':
-    parts = sum_part_numbers_in_engine()
-    sum(parts)
-    gears()
+    parts = [detail[0] for detail in part_details()]
+    print(sum(parts))
+    part_indices = [(number, line_index, start_index, end_index) for number, line_index, start_index, end_index in
+                    part_details()]
+    print(gears(part_indices))
